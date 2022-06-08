@@ -28,7 +28,9 @@ pub fn process_instruction(
     instruction_data: &[u8],
 ) -> ProgramResult {
     msg!("Hello World Rust program entrypoint");
+    msg!("Instruction data {:?}", instruction_data);
     let instruction = HelloInstruction::unpack(instruction_data)?;
+    msg!("Instruction {:?}", instruction);
 
     // Iterating accounts is safer than indexing
     let accounts_iter = &mut accounts.iter();
@@ -51,7 +53,7 @@ pub fn process_instruction(
         HelloInstruction::Decrement => {
             greeting_account.counter -= 1;
         }
-        HelloInstruction::Set(val)   => {
+        HelloInstruction::Set(val) => {
             greeting_account.counter = val;
         }
     }
