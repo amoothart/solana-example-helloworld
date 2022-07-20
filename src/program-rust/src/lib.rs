@@ -89,7 +89,12 @@ mod test {
             false,
             Epoch::default(),
         );
-        let instruction_data: Vec<u8> = Vec::new();
+        
+        let  arr = u32::to_le_bytes(100);
+        let mut instruction_data = [2;5];
+        for i in 0..4 {
+            instruction_data[i+1] = arr[i]
+        }
 
         let accounts = vec![account];
 
@@ -104,14 +109,51 @@ mod test {
             GreetingAccount::try_from_slice(&accounts[0].data.borrow())
                 .unwrap()
                 .counter,
-            1
+            100
         );
+        let mut instruction_data = [0;5];
         process_instruction(&program_id, &accounts, &instruction_data).unwrap();
         assert_eq!(
             GreetingAccount::try_from_slice(&accounts[0].data.borrow())
                 .unwrap()
                 .counter,
-            2
+            101
         );
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_negative_decrement() {
+        let program_id = Pubkey::default();
+        let key = Pubkey::default();
+        let mut lamports = 0;
+        let mut data = vec![0; mem::size_of::<u32>()];
+        let owner = Pubkey::default();
+        let account = AccountInfo::new(
+            &key,
+            false,
+            true,
+            &mut lamports,
+            &mut data,
+            &owner,
+            false,
+            Epoch::default(),
+        );
+        
+        let  arr = u32::to_le_bytes(100);
+        let mut instruction_data = [1;5];
+        for i in 0..4 {
+            instruction_data[i+1] = arr[i]
+        }
+
+        let accounts = vec![account];
+
+        assert_eq!(
+            GreetingAccount::try_from_slice(&accounts[0].data.borrow())
+                .unwrap()
+                .counter,
+            0
+        );
+        process_instruction(&program_id, &accounts, &instruction_data).unwrap();
     }
 }
